@@ -1,7 +1,11 @@
 import Directory from '../../components/directory/directory.component';
 
-const Home = () => {
 
+/*
+Route component that renders the shopping categories UI onto the homepage
+using the Directory component.
+*/
+const Home = () => {
   const categories = [
     {
       "id": 1,
