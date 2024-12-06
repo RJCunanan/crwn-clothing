@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 
 import FormInput from '../form-input/form-input.component';
 import Button from '../button/button.component';
+
+import { UserContext} from '../../contexts/user.context'
 
 import { 
     signInWithGooglePopup, 
@@ -21,6 +23,9 @@ const SignInForm = () => {
     const [formFields, setFormFields] = useState(defaultFormFields);
     const { email, password } = formFields;
 
+    // Get the setter from the UserContext object
+    const { setCurrentUser } = useContext(UserContext);
+
     const resetFormFields = () => {
         setFormFields(defaultFormFields);
     };
@@ -38,8 +43,11 @@ const SignInForm = () => {
 
         // See if user is authenticated with email and password
         try {
-            const response = await signInAuthUserWithEmailAndPassword(email, password);
-            console.log(response);
+            // Get the user object when the user signs in
+            const {user} = await signInAuthUserWithEmailAndPassword(email, password);
+
+            // Store the user object in the UserContext
+            setCurrentUser(user);
 
             // Clear out the form fields
             resetFormFields();

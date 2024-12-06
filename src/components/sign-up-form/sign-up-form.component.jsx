@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 
 import FormInput from '../form-input/form-input.component';
 import Button from '../button/button.component';
 
 import { createAuthUserWithEmailAndPassword, createUserDocumentFromAuth } from '../../utils/firebase/firebase.utils';
+
+import { UserContext } from '../../contexts/user.context';
 
 import './sign-up-form.styles.scss';
 
@@ -18,7 +20,8 @@ const SignUpForm = () => {
     const [formFields, setFormFields] = useState(defaultFormFields);
     const { displayName, email, password, confirmPassword } = formFields;
 
-    console.log(formFields);
+    // Get the setter function from the context
+    const { setCurrentUser } = useContext(UserContext);
 
     const resetFormFields = () => {
         setFormFields(defaultFormFields);
@@ -38,6 +41,9 @@ const SignUpForm = () => {
         // See if user is authenticated with email and password
         try {
             const { user } = await createAuthUserWithEmailAndPassword(email, password);
+
+            // Update the context
+            setCurrentUser(user);
             
             // Create a user document from what is returned from 
             // createAuthUserWithEmailAndPassword
