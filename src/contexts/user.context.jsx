@@ -1,4 +1,6 @@
-import { createContext, useState } from 'react';
+import { createContext, useState, useEffect } from 'react';
+
+import { onAuthStateChangedListener, createUserDocumentFromAuth } from '../utils/firebase/firebase.utils';
 
 // The actual value you want to access
 export const UserContext = createContext({
@@ -13,6 +15,18 @@ export const UserProvider = ({ children }) => {
 
     // The value that will be passed and the setter
     const value = { currentUser, setCurrentUser };
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChangedListener((user) => {
+            if(user) {
+                createUserDocumentFromAuth(user);
+            }
+            setCurrentUser(user);
+        })
+
+        // Unsubscribe the listener from the stream
+        return unsubscribe;
+    }, []);
 
     // Allows retrieval of value and calling of setter anywhere in
     // the component tree that is nested inside of the Provider

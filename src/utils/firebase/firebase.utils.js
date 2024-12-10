@@ -7,6 +7,7 @@ import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     signOut,
+    onAuthStateChanged,
 } from 'firebase/auth';
 import {
     getFirestore,   // method that allows us to instantiate our firestore db instance
@@ -45,7 +46,7 @@ export const signInWithGoogleRedirect = () => signInWithRedirect(auth, googlePro
 export const db = getFirestore();
 
 // Takes data from user authentication service and stores it inside of Firestore
-export const createUserDocumentFromAuth = async (userAuth, additionalInformation = {displayName: 'mike'}) => {
+export const createUserDocumentFromAuth = async (userAuth, additionalInformation = {}) => {
     // Exit if userAuth is not recieved
     if (!userAuth) return;
     
@@ -101,3 +102,7 @@ export const signInAuthUserWithEmailAndPassword = async (email, password) => {
 }
 
 export const signOutUser = async () => await signOut(auth);
+
+export const onAuthStateChangedListener = (callback) => {
+    onAuthStateChanged(auth, callback);
+}

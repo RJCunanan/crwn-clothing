@@ -19,14 +19,8 @@ below it.
 */
 const Navigation = () => {
     // Get the user value from the context
-    const { currentUser, setCurrentUser } = useContext(UserContext);
-    
-    const signOutHandler = async () => {
-        await signOutUser();
+    const { currentUser } = useContext(UserContext);
 
-        // Reset the context to reflect the user signing out
-        setCurrentUser(null);
-    }
 
     return (
       <Fragment>
@@ -40,7 +34,7 @@ const Navigation = () => {
                 </Link>
                 {
                     currentUser ? (
-                        <span className='nav-link' onClick={signOutHandler}>SIGN OUT</span>
+                        <span className='nav-link' onClick={signOutUser}>SIGN OUT</span>
                     ) : (
                         <Link className='nav-link' to='/auth'>
                             SIGN IN
