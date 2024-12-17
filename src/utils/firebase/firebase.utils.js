@@ -13,7 +13,11 @@ import {
     getFirestore,   // method that allows us to instantiate our firestore db instance
     doc,    // method that allows us to retrieve documents inside our firestore database
     getDoc, // method that lets us get a document's data
-    setDoc  // method that lets us set a document's data
+    setDoc,  // method that lets us set a document's data
+    collection, // method that allows us to get a collection reference
+    writeBatch, // method that writes to a collection
+    query,
+    getDocs,
 } from 'firebase/firestore'
 
 
@@ -44,6 +48,47 @@ export const signInWithGoogleRedirect = () => signInWithRedirect(auth, googlePro
 
 // Instantiate our Firestore database
 export const db = getFirestore();
+
+export const addCollectionAndDocuments = async (collectionKey, objectsToAdd) => {
+    // Search the database for the correct collection using the collectionKey
+    const collectionRef = collection(db, collectionKey);
+
+    // Create an instance of batch from the database
+    const batch = writeBatch(db);
+
+    objectsToAdd.forEach((object) => {
+        // Create a document reference from the specified collection by getting
+        // the key or the object's title
+        const docRef = doc(collectionRef, object.title.toLowerCase())
+
+        // Using the location provided by the docRef, set the value of the object
+        // in the collection
+        batch.set(docRef, object);
+    });
+
+    // Fire off the batch
+    await batch.commit();
+    console.log('done');
+}
+
+export const getCategoriesAndDocuments = async () => {
+    const collectionRef = collection(db, 'categories');
+
+    // Generate a query off of the provided collection reference
+    const q = query(collectionRef);
+
+    // Asynchronously fetch the document snapshots
+    const querySnapshot = await getDocs(q);
+
+    // Build out the category map object
+    const categoryMap = querySnapshot.docs.reduce((acc, docSnapshot) => {
+        const { title, items } = docSnapshot.data();
+        acc[title.toLowerCase()] = items;
+        return acc;
+    }, {});
+
+    return categoryMap;
+}
 
 // Takes data from user authentication service and stores it inside of Firestore
 export const createUserDocumentFromAuth = async (userAuth, additionalInformation = {}) => {
