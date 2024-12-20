@@ -1,17 +1,29 @@
-import './button.styles.scss';
+import { BaseButton, GoogleSignInButton, InvertedButton } from "./button.styles";
 
 // Allows us to apply different classNames for different styling depending
 // on the type of button.
-const BUTTON_TYPE_CLASSES = {
+export const BUTTON_TYPE_CLASSES = {
+    base: 'base',
     google: 'google-sign-in',
     inverted: 'inverted',
 }
 
+// Takes the button type string and returns one of the three button components
+const getButton = (buttonType = BUTTON_TYPE_CLASSES.base) => (
+    {
+        [BUTTON_TYPE_CLASSES.base]: BaseButton,
+        [BUTTON_TYPE_CLASSES.google]: GoogleSignInButton,
+        [BUTTON_TYPE_CLASSES.inverted]: InvertedButton,
+    }[buttonType]
+)
+
 const Button = ({ children, buttonType, ...otherProps }) => {
+    // Creates component that points to one of the three relevant buttons
+    const CustomButton = getButton(buttonType);
     return (
-        <button className={`button-container ${BUTTON_TYPE_CLASSES[buttonType]}`} {...otherProps}>
+        <CustomButton {...otherProps}>
             {children}
-        </button>
+        </CustomButton>
     )
 }
 

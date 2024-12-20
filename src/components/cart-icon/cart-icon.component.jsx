@@ -1,13 +1,8 @@
 import { useContext } from 'react';
 
-// Updated way to use import svg files using vite-plugin-svgr.
-// See link below for explanation:
-// Link: https://stackoverflow.com/questions/70309561/unable-to-import-svg-with-vite-as-reactcomponent
-import ShoppingIcon from '../../assets/shopping-bag.svg?react';
-
 import { CartContext } from '../../contexts/cart.context';
 
-import './cart-icon.styles.scss';
+import { ShoppingIcon, CartIconContainer, ItemCount } from './cart-icon.styles';
 
 
 const CartIcon = () => {
@@ -16,10 +11,10 @@ const CartIcon = () => {
     const toggleIsCartOpen = () => setIsCartOpen(!isCartOpen);
 
     return (
-        <div className='cart-icon-container' onClick={toggleIsCartOpen}>
+        <CartIconContainer onClick={toggleIsCartOpen}>
             <ShoppingIcon className='shopping-icon' />
-            <span className='item-count'>{cartCount}</span>
-        </div>
+            <ItemCount>{cartCount}</ItemCount>
+        </CartIconContainer>
     )
 }
 
