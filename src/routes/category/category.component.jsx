@@ -5,7 +5,7 @@ import ProductCard from '../../components/product-card/product-card.component';
 
 import { CategoriesContext } from '../../contexts/categories.context';
 
-import './category.styles.scss';
+import { CategoryContainer, Title } from './category.styles';
 
 const Category = () => {
     // Get the category parameter value from the path in our shop component
@@ -23,13 +23,13 @@ const Category = () => {
 
     return (
         <Fragment>
-            <h2 className='category-title'>{category.toUpperCase()}</h2>
-            <div className='category-container'>
+            <Title>{category.toUpperCase()}</Title>
+            <CategoryContainer>
                 {   // Safeguard: Render the products map only if products is NOT undefined.
                     // Protects from async fetch code from the categories context.
                     products && products.map((product) => <ProductCard key={product.id} product={product} />)
                 }
-            </div>
+            </CategoryContainer>
         </Fragment>
     )
 }
