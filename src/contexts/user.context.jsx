@@ -1,6 +1,11 @@
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useEffect, useReducer } from 'react';
 
-import { onAuthStateChangedListener, createUserDocumentFromAuth } from '../utils/firebase/firebase.utils';
+import { createAction } from '../utils/reducer/reducer.utils';
+
+import { 
+    onAuthStateChangedListener, 
+    createUserDocumentFromAuth, 
+} from '../utils/firebase/firebase.utils';
 
 // The actual value you want to access
 export const UserContext = createContext({
@@ -9,9 +14,37 @@ export const UserContext = createContext({
     setCurrentUser: () => null,     // empty function that returns null
 });
 
+export const USER_ACTION_TYPES = {
+    SET_CURRENT_USER: 'SET_CURRENT_USER',
+}
+
+const INITIAL_STATE = {
+    currentUser: null
+}
+
+const userReducer = (state, action) => {
+    const { type, payload } = action;
+    
+    switch(type) {
+        case USER_ACTION_TYPES.SET_CURRENT_USER:
+            return {
+                ...state,
+                currentUser: payload
+            }
+        default:
+            throw new Error(`Unhandled type ${type} in userReducer`);
+
+    }
+}
+
 export const UserProvider = ({ children }) => {
-    // Store the user state using hook
-    const [currentUser, setCurrentUser] = useState(null);
+    const [ state, dispatch ] = useReducer(userReducer, INITIAL_STATE);
+    const { currentUser } = state;
+    
+    // Passes the action object to userReducer:
+    const setCurrentUser = (user) => {
+        dispatch(createAction(USER_ACTION_TYPES.SET_CURRENT_USER, user));
+    }
 
     // The value that will be passed and the setter
     const value = { currentUser, setCurrentUser };
@@ -31,4 +64,4 @@ export const UserProvider = ({ children }) => {
     // Allows retrieval of value and calling of setter anywhere in
     // the component tree that is nested inside of the Provider
     return <UserContext.Provider value={value}>{children}</UserContext.Provider>
-}
+};
