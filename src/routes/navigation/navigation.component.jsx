@@ -1,11 +1,12 @@
 import { Fragment, useContext } from "react";
 import { Outlet, Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 import CartIcon from "../../components/cart-icon/cart-icon.component";
 import CartDropdown from "../../components/cart-dropdown/cart-dropdown.component";
 
-import { UserContext } from "../../contexts/user.context";
 import { CartContext } from "../../contexts/cart.context";
+import { selectCurrentUser } from "../../store/user/user.selector";
 
 // Updated way to use import svg files using vite-plugin-svgr.
 // See link below for explanation:
@@ -23,8 +24,9 @@ to other pages at the top of our app and any other nested route components
 below it.
 */
 const Navigation = () => {
-    // Get the user and cart from their context
-    const { currentUser } = useContext(UserContext);
+    // Gets the current user from the state using a selector function and the
+    // useSelector hook.
+    const currentUser = useSelector(selectCurrentUser);
     const { isCartOpen } = useContext(CartContext);
 
     return (
