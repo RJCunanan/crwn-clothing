@@ -2,6 +2,7 @@ import { combineReducers } from "redux";
 
 import { userReducer } from "./user/user.reducer";
 import { categoriesReducer } from "./categories/category.reducer";
+import { cartReducer } from "./cart/cart.reducer";
 
 // Takes all of the existing reducers and combine them into one root reducer.
 export const rootReducer = combineReducers({
@@ -9,4 +10,5 @@ export const rootReducer = combineReducers({
     // reducer functions themselves 
     user: userReducer,
     categories: categoriesReducer,
+    cart: cartReducer,
 });

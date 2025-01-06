@@ -11,8 +11,6 @@ import { CategoryContainer, Title } from './category.styles';
 const Category = () => {
     // Get the category parameter value from the path in our shop component
     const { category } = useParams();
-    
-    console.log('render/re-rendering category component');
 
     // Get our categories map from the selector
     const categoriesMap = useSelector(selectCategoriesMap);
@@ -21,7 +19,6 @@ const Category = () => {
 
     // Makes it so component only re-renders whenever either the category or categoriesMap changes
     useEffect(() => {
-        console.log('effect fired calling setProducts');
         setProducts(categoriesMap[category]);
     }, [category, categoriesMap])
 
