@@ -80,14 +80,8 @@ export const getCategoriesAndDocuments = async () => {
     // Asynchronously fetch the document snapshots
     const querySnapshot = await getDocs(q);
 
-    // Build out the category map object
-    const categoryMap = querySnapshot.docs.reduce((acc, docSnapshot) => {
-        const { title, items } = docSnapshot.data();
-        acc[title.toLowerCase()] = items;
-        return acc;
-    }, {});
-
-    return categoryMap;
+    // Get the categories as an array
+    return querySnapshot.docs.map((docSnapshot) => docSnapshot.data());
 }
 
 // Takes data from user authentication service and stores it inside of Firestore

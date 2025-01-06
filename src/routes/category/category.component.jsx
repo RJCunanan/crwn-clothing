@@ -1,23 +1,27 @@
-import { useContext, useState, useEffect, Fragment } from 'react';
+import { useState, useEffect, Fragment } from 'react';
+import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 
 import ProductCard from '../../components/product-card/product-card.component';
 
-import { CategoriesContext } from '../../contexts/categories.context';
+import { selectCategoriesMap } from '../../store/categories/category.selector';
 
 import { CategoryContainer, Title } from './category.styles';
 
 const Category = () => {
     // Get the category parameter value from the path in our shop component
     const { category } = useParams();
+    
+    console.log('render/re-rendering category component');
 
-    // Get our categories map from the context
-    const { categoriesMap } = useContext(CategoriesContext);
+    // Get our categories map from the selector
+    const categoriesMap = useSelector(selectCategoriesMap);
 
     const [products, setProducts] = useState(categoriesMap[category]);
 
     // Makes it so component only re-renders whenever either the category or categoriesMap changes
     useEffect(() => {
+        console.log('effect fired calling setProducts');
         setProducts(categoriesMap[category]);
     }, [category, categoriesMap])
 
