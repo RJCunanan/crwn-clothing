@@ -1,29 +1,37 @@
 import { compose, createStore, applyMiddleware } from "redux";
-// import logger from "redux-logger";
+import { persistStore, persistReducer } from "redux-persist";
+import storage from 'redux-persist/lib/storage'
+import logger from "redux-logger";
 
 import { rootReducer } from "./root-reducer";
 
-// Chained currying middleware function for creating reusable middleware functions:
-const loggerMiddleware = (store) => (next) => (action) => {
-    if(!action.type) {
-        return next(action);
-    }
 
-    console.log('type: ', action.type);
-    console.log('payload: ', action.payload);
-
-    // Log the current state
-    console.log('currentState: ', store.getState());
-
-    // Call next() to update the store so we can get the new state
-    next(action);
-
-    // Log the new state
-    console.log('next state: ', store.getState());
+// Config object that tells redux persist what we want
+const persistConfig = {
+    key: 'root',    // persist everything, from the root level
+    storage,        // use local storage in web browser
+    blacklist: ['user'],
 }
 
-const middleWares = [loggerMiddleware];
+// Create a persisted reducer which we will use for our store
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-const composedEnhancers = compose(applyMiddleware(...middleWares));
+// If the node environment is currently not in 'production', then
+// render the logger. Otherwise, filter out any falsey values so they 
+// don't render.
+const middleWares = [process.env.NODE_ENV !== 'production' && logger].filter(Boolean);
 
-export const store = createStore(rootReducer, undefined, composedEnhancers);
+// If we are not in production, the window object exists, and the redux devtools exist,
+// then use redux devtools' compose. Otherwise, use compose from redux.
+const composeEnhancer = 
+    (process.env.NODE_ENV !== 'production' && 
+        window && 
+        window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) ||
+    compose;
+
+const composedEnhancers = composeEnhancer(applyMiddleware(...middleWares));
+
+export const store = createStore(persistedReducer, undefined, composedEnhancers);
+
+// Allows us to persist the store
+export const persistor = persistStore(store);
