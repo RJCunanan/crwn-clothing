@@ -2,7 +2,9 @@ import { compose, createStore, applyMiddleware } from "redux";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from 'redux-persist/lib/storage'
 import logger from "redux-logger";
-import { thunk } from "redux-thunk";
+import createSagaMiddleware from "redux-saga";
+
+import { rootSaga } from "./root-saga";
 
 import { rootReducer } from "./root-reducer";
 
@@ -14,13 +16,19 @@ const persistConfig = {
     whitelist: ['cart'],    // only persist the cart
 }
 
+// Instantiate the saga
+const sagaMiddleware = createSagaMiddleware();
+
 // Create a persisted reducer which we will use for our store
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 // If the node environment is currently not in 'production', then
 // render the logger. Otherwise, filter out any falsey values so they 
 // don't render.
-const middleWares = [process.env.NODE_ENV !== 'production' && logger, thunk].filter(Boolean);
+const middleWares = [
+    process.env.NODE_ENV !== 'production' && logger, 
+    sagaMiddleware,
+].filter(Boolean);
 
 // If we are not in production, the window object exists, and the redux devtools exist,
 // then use redux devtools' compose. Otherwise, use compose from redux.
@@ -32,7 +40,15 @@ const composeEnhancer =
 
 const composedEnhancers = composeEnhancer(applyMiddleware(...middleWares));
 
-export const store = createStore(persistedReducer, undefined, composedEnhancers);
+export const store = createStore(
+    persistedReducer, 
+    undefined, 
+    composedEnhancers
+);
+
+// After the store has instantiated with the saga middlware, tell the saga
+// to run using the root saga.
+sagaMiddleware.run(rootSaga);
 
 // Allows us to persist the store
 export const persistor = persistStore(store);
