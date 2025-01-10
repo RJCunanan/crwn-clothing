@@ -35,8 +35,8 @@ const SignInForm = () => {
 
         // See if user is authenticated with email and password
         try {
-            // Get the user object when the user signs in
-            const {user} = await signInAuthUserWithEmailAndPassword(email, password);
+            // User signs in
+            await signInAuthUserWithEmailAndPassword(email, password);
 
             // Clear out the form fields
             resetFormFields();
