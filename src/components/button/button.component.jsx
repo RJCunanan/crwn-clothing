@@ -1,4 +1,4 @@
-import { BaseButton, GoogleSignInButton, InvertedButton } from "./button.styles";
+import { BaseButton, GoogleSignInButton, InvertedButton, ButtonSpinner } from "./button.styles";
 
 // Allows us to apply different classNames for different styling depending
 // on the type of button.
@@ -17,12 +17,12 @@ const getButton = (buttonType = BUTTON_TYPE_CLASSES.base) => (
     }[buttonType]
 )
 
-const Button = ({ children, buttonType, ...otherProps }) => {
+const Button = ({ children, buttonType, isLoading, ...otherProps }) => {
     // Creates component that points to one of the three relevant buttons
     const CustomButton = getButton(buttonType);
     return (
-        <CustomButton {...otherProps}>
-            {children}
+        <CustomButton disabled={isLoading} {...otherProps}>
+            {isLoading ? <ButtonSpinner /> : children}
         </CustomButton>
     )
 }

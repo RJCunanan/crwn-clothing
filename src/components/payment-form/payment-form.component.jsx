@@ -1,12 +1,20 @@
+import { useState } from "react";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import { useSelector } from "react-redux";
 
-import Button, { BUTTON_TYPE_CLASSES } from '../button/button.component'
+import { selectCartTotal} from '../../store/cart/cart.selector';
+import { selectCurrentUser } from '../../store/user/user.selector';
 
-import { PaymentFormContainer, FormContainer } from "./payment-form.styles";
+import { BUTTON_TYPE_CLASSES } from '../button/button.component';
+
+import { PaymentFormContainer, FormContainer, PaymentButton } from "./payment-form.styles";
 
 const PaymentForm = () => {
     const stripe = useStripe();
     const elements = useElements();
+    const amount = useSelector(selectCartTotal);
+    const currentUser = useSelector(selectCurrentUser);
+    const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
     const paymentHandler = async (e) => {
         // Stops any typical form submission behavior from happening
@@ -17,6 +25,8 @@ const PaymentForm = () => {
             return;
         }
 
+        setIsProcessingPayment(true);
+
         // Get the netlify payment intent
         // NOTE: the route is relative to the root folder
         const response = await fetch('/.netlify/functions/create-payment-intent', {
@@ -24,13 +34,11 @@ const PaymentForm = () => {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ amount: 10000 })
+            body: JSON.stringify({ amount: amount * 100 })  // converts amount to cents for stripe
         }).then(res => res.json())
 
         // Get the client secret token
         const {paymentIntent: { client_secret }} = response;
-
-        console.log(client_secret);
 
         // Create the actual payment
         const paymentResult = await stripe.confirmCardPayment(client_secret, {
@@ -38,10 +46,12 @@ const PaymentForm = () => {
                 // Get all the necessary info from the card
                 card: elements.getElement(CardElement),
                 billing_details: {
-                    name: 'Yihua Zhang'
-                }
-            }
+                    name: currentUser ? currentUser.displayName : 'Guest',
+                },
+            },
         });
+
+        setIsProcessingPayment(false);
 
         // Check for any errors from stripe
         if (paymentResult.error) {
@@ -58,7 +68,9 @@ const PaymentForm = () => {
             <FormContainer onSubmit={paymentHandler}>
                 <h2>Credit Card Payment: </h2>
                 <CardElement />
-                <Button buttonType={BUTTON_TYPE_CLASSES.inverted}> Pay now </Button>
+                <PaymentButton isLoading={isProcessingPayment} buttonType={BUTTON_TYPE_CLASSES.inverted}>
+                     Pay now 
+                </PaymentButton>
             </FormContainer>
         </PaymentFormContainer>
     )
