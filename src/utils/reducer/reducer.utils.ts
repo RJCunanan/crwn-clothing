@@ -1,4 +1,14 @@
-import { AnyAction } from 'redux';
+import { AnyAction, UnknownAction } from 'redux';
+
+// type Matchable<AC extends () => AnyAction> = AC & {
+//     type: ReturnType<AC>['type'];
+//     match(action: AnyAction): action is ReturnType<AC>;
+// }
+
+type Matchable<AC extends () => UnknownAction> = AC & {
+    type: ReturnType<AC>['type'];
+    match(action: UnknownAction): action is ReturnType<AC>;
+}
 
 export type ActionWithPayload<T, P> = {
     type: T;    // will be one of our enum values we will pass in
